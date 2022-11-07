@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Tirar CreatedAt do Sequelize | Luiz Tools</title>
+</head>
+<body>
+    <div class="t">
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    <h1>Tirar "CreatedAt" do Sequelize</h1>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </div>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+
+    <h1>Como tirar "CreatedAt" do Sequelize</h1>
+    
+
+    <p>Quando estudamos arquitetura de computadores, seja na faculdade ou no técnico, aprendemos que existem recursos computacionais mais lentos e mais rápidos. Por exemplo, ler a memória RAM é extremamente rápido, enquanto escrever em um disco é extremamente lento.</p>
+
+        <p>No entanto, quanto mais rápido o recurso, mais caro ele é e portanto mesmo recursos lentos como discos rígidos ainda são de grande valia dado o seu baixo custo por GB de armazenamento. Além disso, existem técnicas para diminuir a “lentidão” do acesso à disco.</p>
+        
+        <p>A técnica mais comum para isso, a nível de aplicação, é caching, que veremos neste tutorial.</p>
+        
+        <p>Atenção: este é um tutorial intermediário de Node.js, ele pressupõe que você já saiba criar um CRUD com ele antes de avançar. Se você não está nesse nível ainda, sugiro buscar algum tutorial mais iniciante ou meus livros.</p>
+        
+        <p>Se preferir, pode acompanhar no vídeo abaixo ao invés do texto.</p>
+    </br>
+</br>
+</br>    </br>
+    <h2>#1 – O que é caching?</h2>
+    <p>Caching consiste em armazenar em memória (rápida) conteúdos acessados com frequência que estejam originalmente no disco (lento). Assim, ao invés de ficar indo o tempo todo no disco para pegar a mesma informação, primeiro verificamos se ela não está em cache e, se estiver, pega de lá mesmo. Se não estiver, vamos no disco e, antes de devolver o dado solicitado, deixamos uma cópia na cache, para que na chamada posterior, ela seja pega de lá.</p>
+    <p>É exatamente isso que faz o processador com a sua memória cache interna. Ele prioriza ela ao invés da RAM, por sua maior velocidade.</p>
+    <p>De maneira bem simplista a técnica é essa e, via de regra, você pode implementar isso usando variáveis e objetos em memória mesmo, armazenando seus dados recorrentes no próprio processo da aplicação.</p>
+    <p>No entanto, fazer a gestão profissional de recursos em cache pode implicar em ter de lidar com conceitos como busca, invalidação, desduplicação, entre outros. Nestes casos, o ideal é partir para soluções criadas para este fim, como o Redis.</p>
+
+    <p><a href="./teste.html">Próximo</a></p>
+
+</br>
+</br>
+</br>    </br>
+</br>
+</br>
+
+<!-------------------------------- app.js ----------------------------------->
+<!-- import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import './App.css';
+import Home from './pages/Home';
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Not from './pages/404'
+
+function App() {
+  return (
+    <>
+    <ToastContainer/>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<Not />} />
+      </Routes>
+    </ BrowserRouter>
+    </>
+  );
+}
+
+export default App; -->
+<!-------------------------------- app.js ----------------------------------->
+
+
+<!-------------------------------- home.js ----------------------------------->
+<!-- import axios from "axios";
+import React, { useEffect, useState }  from "react";
+import Area from "../../components/area";
+import './style.css'
+
+const Home = () =>{
+
+    let aCor = []
+    const [cor, setCor] = useState([])
+
+
+    const backColor = () => {
+        axios.get("http://localhost:3011/trocarCor")
+        .then((res) => {
+
+            // -------------------------- Área 1 -------------------------- 
+            if(res.data[0].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[1].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#FFF")
+            }
+
+            // -------------------------- Área 2 -------------------------- 
+            if(res.data[2].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[3].length > 0){
+                    aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 3 -------------------------- 
+            if(res.data[4].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[5].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 4 -------------------------- 
+            if(res.data[6].length === 5){
+
+                aCor.push("#B22222")
+            }
+            else if(res.data[7].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 5 -------------------------- 
+            if(res.data[8].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[9].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 6 -------------------------- 
+            if(res.data[10].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[11].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 7 -------------------------- 
+            if(res.data[12].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[13].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 8 -------------------------- 
+            if(res.data[14].length === 5){
+                aCor.push("#B22222")
+            }
+            else if(res.data[15].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 9 -------------------------- 
+            if(res.data[16].length === 5){
+
+                aCor.push("#B22222")
+            }
+            else if(res.data[17].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+
+            // -------------------------- Área 10 -------------------------- 
+            if(res.data[18].length === 5){
+
+                aCor.push("#B22222")
+            }
+            else if(res.data[19].length > 0){
+                aCor.push("#1E90FF")
+            }
+            else{
+                aCor.push("#fff")
+            }
+            setCor(aCor)
+        })
+    }
+
+        let aArea = []
+        const [area, setArea] = useState([]);
+
+        useEffect(() => {
+            axios.get('http://localhost:3011/listarArea')
+            .then((response) => response.data)
+            .then((response) => {
+                aArea = []
+                for(let cont = 0; cont < response.length; cont++){
+                    aArea.push(response[cont]['id_area'])
+                }
+                setArea(aArea)
+            })
+            backColor()
+        }, [])
+
+
+    return(
+        <div>
+            {area.map((a, idx) => {
+                return(
+                    <Area area={a} styleArea={a} nomeArea={a} redArea={a} id={a} cor={cor[idx]} />
+                )
+            })}
+            <button className="btnLegenda1"></button>
+            <p className="txtBtn">Nenhum alugado</p>
+            <button className="btnLegenda2"></button>
+            <p className="txtBtn2">Algumas vagas disponíveis</p>
+            <button className="btnLegenda3"></button>
+            <p className="txtBtn3">Vagas indisponíveis</p>
+        </div>
+    );
+}
+
+export default Home; -->
+<!-------------------------------- home.js ----------------------------------->
+
+<!-------------------------------- homeStyle.js ----------------------------------->
+<!-- .btnLegenda1{
+    background-color: #fff;
+    border: 1px solid #000;
+    height: 15px;
+    width: 20px;
+    position: fixed;
+    top: 93%;
+    left: 25%;
+    display: inline-block;
+}
+.txtBtn{
+    display: inline-block;
+    position: absolute;
+    top: 90%;
+    left: 27%;
+}
+
+
+.btnLegenda2{
+    background-color: #1E90FF;
+    border: 1px solid #000;
+    position: fixed;
+    height: 15px;
+    width: 20px;
+    top: 93%;
+    left: 40%;
+    display: inline-block;
+}
+.txtBtn2{
+    display: inline-block;
+    position: absolute;
+    top: 90%;
+    left: 42%;
+}
+
+.btnLegenda3{
+    background-color: #B22222;
+    border: 1px solid #000;
+    position: fixed;
+    height: 15px;
+    width: 20px;
+    top: 93%;
+    left: 58%;
+    display: inline-block;
+}
+.txtBtn3{
+    display: inline-block;
+    position: absolute;
+    top: 90%;
+    left: 60%;
+} -->
+<!-------------------------------- homeStyle.js ----------------------------------->
+
+<!-------------------------------- area.js ----------------------------------->
+<!-- import React, { useEffect, useState } from "react";
+import './style.css';
+import Modal from 'react-modal';
+import { toast } from "react-toastify";
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+const Area = (props) =>{
+
+  const [colorBtn, setColorBtn] = useState("#15a4f7a4"); // Vai trocar a cor do botão se os carros estiverem indisponíveis
+  const [disableUM, setDisableUM] = useState(false); // Vai desabilitar o botão
+  const [modalIsopen, setIsopen] = useState(false); // Vai abrir o modal 1
+  const [modalIsopen2, setIsopen2] = useState(false); // Vai abrir o modal 2
+  const [id, setId] = useState(); // Vai receber o valor do id do carro
+
+  const [marca, setMarca] = useState([]); // Vai pegar a marca do carro
+  const [valor, setValor] = useState([]); // Vai pegar o valor do carro
+  const [carro, setCarro] = useState([]); // Vai pegar o carro
+
+  const [nome, setNome] = useState([]); // Vai receber os nomes em um array
+  const [conc, setConc] = useState([]); // Vai receber a concessionária em um array
+  const [nomeMarca, setNomeMarca] = useState([]); // Vai receber o nome da marca do carro em um array
+  const [user, setUser] = useState('FELIPE SILVA'); // Vai receber o valor do input do usuário selecionado
+  const [idConc, setIdConc] = useState('H-POINT'); // Vai receber o valor do input do nome da concessionária 
+  const [txtInd, setTxtInd] = useState('');
+
+
+  // ------------------- FUNÇÕES DO MODAL 1 ---------------------
+  
+  // Abrir o Modal
+  function openModal(id){
+    listarInfoCarros(id);
+    setIsopen(true);
+  };
+
+  // Fechar o Modal
+  function closeModal(){
+    setIsopen(false);
+  };
+  // ------------------- FIM FUNÇÕES DO MODAL 1 ---------------------
+
+  // ------------------- FUNÇÕES DO MODAL 2 ---------------------
+
+  // Abrir modal
+  function openModal2(val){
+    setId(val);
+    listarInformacoes(val);
+    setIsopen2(true);
+  };
+
+  // Fecahr modal
+  function closeModal2(){
+    setTxtInd("")
+    setIsopen2(false);
+  };
+
+  let aMarca = []; // Array que vai armazenar o modelo do carro
+  let aValor = []; // Array que vai armazenar o valor do carro
+  let aCarro = []; // Array que vai armazenar o id do carro
+
+  const listarInfoCarros = (id) => {
+    axios.post("http://localhost:3011/listarCarros",{
+      ids: id
+    })
+    .then((res) => res.data)
+    .then((res) => {
+      for (let cont = 0; cont < res.length; cont++){
+        aMarca.push(res[cont]['modelo']);
+        aValor.push(res[cont]['preco']);
+        aCarro.push(res[cont]['id_carro']);
+      }
+      setMarca(aMarca);
+      setValor(aValor);
+      setCarro(aCarro);
+    });
+  };
+
+  const listarInformacoes = (id) =>{
+    axios.post("http://localhost:3011/listarInformacoes", {
+      idcarro: id,
+    })
+    .then((res) => {
+      setNome(res.data.nome);
+      setConc(res.data.conc);
+      setNomeMarca(res.data.nm);
+    });
+  };
+
+  // Função que vai realizar a venda do carro 
+  const venderCarro = (idVend, id2) =>{
+    axios.post("http://localhost:3011/vender",{
+      nome: user,
+      idcarro: idVend,
+      idc: idConc,
+      qtd_carro: 1
+    })
+    .then((res) => {
+      if(id2 !== 0) {
+        toast.success(`${nomeMarca} vendido com sucesso!`)
+      }
+      else {
+        toast.error(`${nomeMarca} indisponíveil! 😕`)
+      }
+      });
+  };
+
+  const verificarVenda = (id) =>{
+    axios.post("http://localhost:3011/verificarVenda",{
+      idcarro: id
+    })
+    .then((res) => {
+      if(res.data > 0){
+        venderCarro(id, res.data)
+      }
+      else{
+        toast.error(`${nomeMarca} indisponíveil! 😕`)
+      }
+    })
+    qtdDisponivel(id)
+  }
+
+  const qtdDisponivel = (id) =>{
+    axios.post("http://localhost:3011/verificarVenda",{
+      idcarro: id
+    })
+    .then((res) => {
+      setTxtInd("Carros disponíveis: " + res.data)
+    })
+  }
+  // ------------------- FIM FUNÇÕES DO MODAL 2 ---------------------
+
+    return(
+      <div>
+        <div style={{background: props.cor}} className={`area-${props.styleArea}`}>
+            <h2 className={`nome-${props.nomeArea}`}>Area {props.area}</h2>
+            <button onClick={() => openModal(props.id)}>Open</button>
+
+            {/* Modal 1 */}
+            <Modal
+              isOpen={modalIsopen}
+              contentlabel="example modal"
+              overlayClassName="modal"
+              className="modal-content"
+            >
+              <h2>Carros disponíveis</h2>
+              {marca.map((marcas, idx) => {
+                return(
+                  <div>
+                    <div className="infoCarro">
+                      <h3>{marcas}</h3>
+                      <p>R${valor[idx]},00</p>
+                      <Link>
+                        <button className='btnVenda' onClick={() => openModal2(carro[idx])}>Vender</button>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+              <button className='btnClose' onClick={closeModal}>Voltar</button>
+            </Modal>
+            {/* Fim Modal 1 */}
+
+            {/* Modal 2 */}
+            <Modal
+              isOpen={modalIsopen2}
+              contentlabel="example modal"
+              overlayClassName="modal"
+              className="modal-content"
+            >
+                <h2>{nomeMarca}</h2>
+                <br />
+                <p>Nome:</p>
+                <select className="select" defaultValue={null} value={user} onChange={e => setUser(e.target.value)}>
+                  {nome.map((nomes, idx) =>{
+                    return(
+                      <option value={nomes}>{nomes}</option>
+                    );
+                  })}
+                </select>
+                <p>Concessionária</p>
+                <select className="select" value={idConc} onChange={e => setIdConc(e.target.value)}>
+                  {conc.map((concs, idx) =>{
+                    return(
+                      <option value={concs}>{concs}</option>
+                    );
+                  })}
+                </select>
+                <br/>
+                <button disabled={disableUM}  className='btnCompra' style={{backgroundColor: colorBtn}} onClick={() => verificarVenda(id)} >Comprar</button>
+                <p className="txtInd">{txtInd}</p>
+                <button className='btnInfo' onClick={() => qtdDisponivel(id)}>Carros disponíveis</button>
+                <button className='btnClose2' onClick={closeModal2}>Voltar</button>
+            </Modal>
+            {/* Fim Modal 2 */}
+        </div>
+      </div>
+    );
+}
+
+// Exportar módulo
+export default Area; -->
+<!-------------------------------- area.js ----------------------------------->
+
+<!-------------------------------- areaStyle.js ----------------------------------->
+<!-- .redirect-area{
+    text-decoration: none;
+    color : #000;
+    margin-top: 0%;
+}
+
+.area-1, .area-2, .area-3,
+ .area-4, .area-5, .area-6,
+  .area-7, .area-8, .area-9,
+   .area-10{
+        text-align: center;
+        padding-top: 19px;
+        transition: 1s;
+}
+
+.area-1:hover, .area-2:hover,
+ .area-3:hover, .area-4:hover,
+  .area-5:hover, .area-6:hover,
+   .area-7:hover, .area-8:hover,
+    .area-9:hover, .area-10:hover{
+        transform: scale(1.1);
+}
+
+.area-1{
+    width: 45%;
+    height: 45%;
+    left : 29.5%;
+    top: 20%;
+    position: fixed;
+    border: 1px solid #000;
+
+}
+
+.area-2{
+    width: 40%;
+    height: 25%;
+    position: fixed;
+    left : 32%;
+    top: 60%;
+    border: 1px solid #000;
+    z-index: 1;
+}
+
+.area-3{
+    width: 9%;
+    height: 18%;
+    left : 33%;
+    top: 65%;
+    border: 1px solid #000;
+    position: fixed;
+    z-index: 1;
+}
+
+.area-4{
+    width:9%;
+    height:18%;
+    left : 62%;
+    top: 65%;
+    position: fixed;
+    border: 1px solid #000;
+    z-index: 1;
+}
+
+.area-5{
+    width: 40%;
+    height: 31%;
+    left: 32%;
+    top: 3%;
+    position: fixed;
+    border: 1px solid #000;
+}
+
+.area-6{
+    width: 10%;
+    height: 17%;
+    left : 33%;
+    top: 4%;
+    position: fixed;
+    border: 1px solid #000;
+}
+
+.area-7{
+    width: 10%;
+    height: 19%;
+    position: fixed;
+    left : 15%;
+    top: 40%;
+    border: 1px solid #000;
+}
+
+.area-8{
+    width: 7%;
+    height: 20%;
+    position: fixed;
+    left : 64%;
+    top: 10%;
+    border: 1px solid #000;
+}
+
+.area-9{
+    width: 7%;
+    height: 20%;
+    position: fixed;
+    left : 80%;
+    top: 32%;
+    border: 1px solid #000;
+}
+
+.area-10{
+    width: 15%;
+    height: 30%;
+    position: fixed;
+    left : 76%;
+    top: 60%;
+    border: solid 1px #000;
+}
+
+.nome-1{
+    margin-top: 20px;
+    padding-top: 18%;
+    margin-bottom: 0%;
+}
+
+.nome-2{
+    padding-top: 8%;
+    margin-bottom: 0%;
+}
+
+.nome-5{
+    padding-top: 10%;
+    margin-bottom: 0%;
+}
+
+.nome-8{
+    padding-top: 11%;
+    margin-bottom: 0%;
+}
+
+.nome-9{
+    padding-top: 13%;
+    margin-bottom: 0%;
+}
+
+.nome-10{
+    padding-top: 25%;
+    margin-bottom: 0%;
+}
+
+.modal{
+    width: 93%;
+    height: 95%;
+    left : 3%;
+    top: 2%;
+    text-align: center;
+    border: 1px solid #000;
+    background-color: #fff;
+    box-shadow: 0px 40px 100px 100px rgba(0, 0, 0, 0.91005),
+                 0px 40px 100px 100px rgba(0, 0, 0, 0.91005),
+                 0px 40px 100px 100px rgb(0, 0, 0),
+                 0px 40px 100px 100px rgba(0, 0, 0, 0.91005),
+                 0px 40px 100px 100px rgba(0, 0, 0, 0.91005),
+                 0px 40px 100px 100px rgba(0, 0, 0, 0.91005);
+    position: fixed;
+    z-index: 1;
+  }
+.select{
+    margin: 15px auto;
+    margin-left: 20px;
+    padding: 10px;
+    width: 15%;
+    display: inline-block;
+}
+
+.btnCompra{
+    margin-left: 20px;
+    margin-top: 10px;
+    width: 15%;
+    height: 40px;
+    cursor: pointer;
+    border: 1px solid #000;
+    border-radius: 10px;
+}
+
+.btnVenda{
+    width: 8%;
+    height: 35px;
+    cursor: pointer;
+    border: 1px solid #000;
+    border-radius: 10px;
+    display: inline-block;
+    background-color: #fff;
+    margin-left: 10%;
+}
+
+.btnVenda:hover{
+    background-color: #f3f3f3;
+}
+
+.btnClose{
+    margin: 3% auto;
+    width: 5%;
+    display: block;
+    border: 1px solid #000;
+    border-radius: 10px;
+    height: 35px;
+    cursor: pointer;
+}
+
+.btnClose2{
+    margin: 2% auto;
+    width: 10%;
+    margin-left: 46%;
+    display: block;
+    border: 1px solid #000;
+    border-radius: 10px;
+    height: 35px;
+    cursor: pointer;
+}
+
+.btnInfo{
+    margin: 2% auto;
+    width: 10%;
+    margin-left: 46%;
+    display: block;
+    border: 1px solid #000;
+    border-radius: 5px;
+    height: 35px;
+    cursor: pointer;
+}
+
+.infoCarro{
+    display: block;
+    width: 60%;
+    padding: 10px 0;
+    margin: 0 18%;
+    border-bottom: 1px solid #000;
+}
+
+
+.infoCarro h3, .infoCarro p{
+    padding: 0 10%;
+    display: inline-block;
+}
+
+.txtInd{
+    color: rgb(0, 0, 0);
+    font-size: 20px;
+    width: 40%;
+    padding-left: 31%;
+    margin-top: 10px;
+} -->
+<!-------------------------------- areaStyle.js ----------------------------------->
+
+
+
+
+</body>
+</html>

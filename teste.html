@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="t">
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    <h1>Tirar "CreatedAt" do Sequelize</h1>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    </div>
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+
+    <h1>Como tirar "CreatedAt" do Sequelize</h1>
+    
+
+    <p>Quando estudamos arquitetura de computadores, seja na faculdade ou no técnico, aprendemos que existem recursos computacionais mais lentos e mais rápidos. Por exemplo, ler a memória RAM é extremamente rápido, enquanto escrever em um disco é extremamente lento.</p>
+
+        <p>No entanto, quanto mais rápido o recurso, mais caro ele é e portanto mesmo recursos lentos como discos rígidos ainda são de grande valia dado o seu baixo custo por GB de armazenamento. Além disso, existem técnicas para diminuir a “lentidão” do acesso à disco.</p>
+
+        <p>Final da linha: },{ freezeTableName: true })</p>
+
+        
+        <p>A técnica mais comum para isso, a nível de aplicação, é caching, que veremos neste tutorial.</p>
+        
+        <p>Atenção: este é um tutorial intermediário de Node.js, ele pressupõe que você já saiba criar um CRUD com ele antes de avançar. Se você não está nesse nível ainda, sugiro buscar algum tutorial mais iniciante ou meus livros.</p>
+        
+        <p>Se preferir, pode acompanhar no vídeo abaixo ao invés do texto.</p>
+    </br>
+</br>
+</br>    </br>
+    <h2>#1 – O que é caching?</h2>
+    <p>Caching consiste em armazenar em memória (rápida) conteúdos acessados com frequência que estejam originalmente no disco (lento). Assim, ao invés de ficar indo o tempo todo no disco para pegar a mesma informação, primeiro verificamos se ela não está em cache e, se estiver, pega de lá mesmo. Se não estiver, vamos no disco e, antes de devolver o dado solicitado, deixamos uma cópia na cache, para que na chamada posterior, ela seja pega de lá.</p>
+    <p>É exatamente isso que faz o processador com a sua memória cache interna. Ele prioriza ela ao invés da RAM, por sua maior velocidade.</p>
+    <p>De maneira bem simplista a técnica é essa e, via de regra, você pode implementar isso usando variáveis e objetos em memória mesmo, armazenando seus dados recorrentes no próprio processo da aplicação.</p>
+    <p>No entanto, fazer a gestão profissional de recursos em cache pode implicar em ter de lidar com conceitos como busca, invalidação, desduplicação, entre outros. Nestes casos, o ideal é partir para soluções criadas para este fim, como o Redis.</p>
+
+</br>
+</br>
+</br>    </br>
+</br>
+</br>
+
+<!----------------------------------- config ------------------------------------->
+<!-- const Sequelize = require("sequelize");
+
+const database = new Sequelize('carros', 'root', '', {
+    dialect: "mysql",
+    host: "localhost",
+    port: 3306,
+    define: {
+        timestamps: false
+    }
+});
+
+database.sync();
+
+module.exports = database; -->
+<!----------------------------------- config ------------------------------------->
+
+<!----------------------------------- controllers ------------------------------------->
+<!-- // Importar bibliotecas
+const database = require("../config/dbConfig");
+const {Op} = require('sequelize');
+const { QueryTypes } = require('sequelize');
+
+// Importar Módulos
+const clienteModels = require("../models/clienteModels");
+const concessionariaModels = require("../models/concessionáriaModels");
+const carrosModels = require("../models/carrosModels");
+const locacaoModels = require("../models/locacaoModels");
+const areaModels = require("../models/areaModels");
+
+class usuarioControllers{
+
+
+    static async backColor(req, res){
+        let array = []
+        await database.sync();
+
+        for (let cont = 1; cont < 11; cont++){
+            array.push(await carrosModels.sequelize.query(`select * from carros where idarea = ${cont} and qtd_carro = 0`, { type: QueryTypes.SELECT }))
+            array.push(await carrosModels.sequelize.query(`select * from carros where idarea = ${cont} and qtd_carro < 30 and qtd_carro > 0`, { type: QueryTypes.SELECT }))
+        }
+        res.json(array)
+    };
+
+    static async listarArea(req, res) {
+        await database.sync()
+        let user = await areaModels.findAll({ raw: true })
+        res.status(200).json(user)
+    }
+
+    // ---------------------- Listar Informações ----------------------
+    static async listarInformacoes(req, res){
+        await database.sync();
+        let cliente = await clienteModels.findAll({raw: true});
+        let aNome = [];
+        for(let cont = 0; cont < cliente.length; cont++){
+            aNome.push(cliente[cont]['nome'])
+        }
+        let concessionaria = await concessionariaModels.findAll({raw: true});
+        let aConces = [];
+        for(let cont2 = 0; cont2 < concessionaria.length; cont2++){
+            aConces.push(concessionaria[cont2]['nome'])
+         }
+        let idcar = req.body.idcarro;
+        let carros = await carrosModels.findOne({raw: true, where: {id_carro: idcar}});
+        res.status(200).json({
+            nm: carros.modelo,
+            nome: aNome,
+            conc: aConces
+        });
+    };
+
+    // ---------------------- Listar Carros ----------------------
+    static async listarCarros(req, res){
+        await database.sync();
+        let ids = req.body.ids
+        let user = await carrosModels.findAll({ raw: true, where: {idarea: ids}});
+        res.status(200).json(user);
+    }
+
+    // ---------------------- Verificar Venda de Carros ----------------------
+    static async verificarVenda(req, res){
+        await database.sync();
+        let idcar = req.body.idcarro;
+        let carros = await carrosModels.findOne({raw: true, where: { id_carro: idcar }})
+        res.status(200).json(carros.qtd_carro)
+    }
+
+    // ---------------------- Vender Carros ----------------------
+    static async vender(req, res){
+        await database.sync();
+        let idcar = req.body.idcarro;
+
+        let cliente = await clienteModels.findOne({ where: { nome: req.body.nome } });
+        let idcliente = cliente.id_cliente
+        
+        let carros = await carrosModels.findOne({raw: true, where: { id_carro: idcar }})
+        let idarea = carros.idarea
+
+        let concessionaria = await concessionariaModels.findOne({ where: { nome: req.body.idc } })
+        let idConc = concessionaria.id_concessionária
+        
+        let qtd_nova = carros.qtd_carro - req.body.qtd_carro
+
+        console.log(qtd_nova)
+
+        // Passar os id para o req.body de cada um
+        req.body.idcarro = idcar
+        req.body.idcliente = idcliente
+        req.body.idarea = idarea
+        req.body.idconcessionaria = idConc
+
+        let dadoNovo = req.body
+
+        try{
+            if(carros.qtd_carro > 0){
+                await locacaoModels.create(req.body);
+                req.body.qtd_carro = qtd_nova
+                await carrosModels.update(dadoNovo, { where: { id_carro: idcar }})
+                res.status(200).json("Veículo vendido com sucesso!");
+            }
+            else{
+                console.log("Carro indisponível!")
+            }
+        }
+        catch(err){
+            console.log(err)
+            console.log('Houve um erro no servidor, tente novamente mais tarde!');
+        };
+    };
+};
+
+// Exportar módulos
+module.exports = usuarioControllers -->
+<!----------------------------------- controllers ------------------------------------->
+
+<!----------------------------------- router ------------------------------------->
+<!-- const Express = require('express');
+
+const usuarioControllers = require('../controllers/usuarioControllers')
+const router = Express.Router();
+
+// Rota
+router 
+    .get("/trocarCor", usuarioControllers.backColor)
+    .get("/listarArea", usuarioControllers.listarArea)
+    .post('/listarInformacoes', usuarioControllers.listarInformacoes) 
+    .post('/verificarVenda', usuarioControllers.verificarVenda) 
+    .post('/listarCarros', usuarioControllers.listarCarros) 
+    .post('/vender', usuarioControllers.vender) 
+
+// Exportar Rotas
+module.exports = router; -->
+<!----------------------------------- router ------------------------------------->
+<!----------------------------------- app ------------------------------------->
+<!-- // Importar bibliotecas
+const Express = require('express');
+const cors = require('cors');
+
+// Config app
+const app = Express();
+
+// Importar rota
+const usuarioRouter = require('./router/usuarioRouter');
+
+app.use(Express.json());
+app.use(cors());
+
+// Rotas
+app.use('/', usuarioRouter);
+
+// Config port / servidor
+const port = 3011;
+app.listen(port, () =>{
+    console.log("Servidor rodando na porta 3001");
+}); -->
+<!----------------------------------- app ------------------------------------->
+
+</body>
+</html>
